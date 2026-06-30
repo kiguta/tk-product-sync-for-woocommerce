@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: TK Products Sync for Multisite
- * Plugin URI:  https://ziprof.co.ke
+ * Plugin URI:  https://github.com/kiguta/tk-products-sync-for-multisite
  * Description: Automatically syncs WooCommerce products (Simple & Variable) from the master site to all subsites in a WordPress Multisite network. Includes bulk sync and bulk delete actions.
  * Version:     1.1.2
  * Author:      Tonie Kiguta
@@ -76,7 +76,8 @@ add_action('before_woocommerce_init', function () {
 // ---------------------------------------------------------------------
 
 add_filter('plugin_row_meta', 'tk_plugin_row_meta', 10, 2);
-function tk_plugin_row_meta($links, $file) {
+function tk_plugin_row_meta($links, $file)
+{
     if (plugin_basename(__FILE__) === $file) {
         $links[] = '<a href="https://www.paypal.com/donate/?hosted_button_id=CSQFKDWQZVE4W" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-green.svg" alt="' . esc_attr__('Donate with PayPal', 'tk-products-sync-for-multisite') . '" style="vertical-align:middle;"></a>';
     }
