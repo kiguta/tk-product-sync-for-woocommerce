@@ -1,14 +1,14 @@
 <?php
 /**
- * Plugin Name: TK WooCommerce Product Sync for WordPress Multisite
+ * Plugin Name: TK Product Sync for WooCommerce Multisite
  * Plugin URI:  https://ziprof.co.ke
  * Description: Automatically syncs WooCommerce products (Simple & Variable) from the master site to all subsites in a WordPress Multisite network. Includes bulk sync and bulk delete actions.
- * Version:     1.1.1
+ * Version:     1.1.2
  * Author:      Tonie Kiguta
  * Author URI:  https://ziprof.co.ke
  * License:     GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: tk-woocommerce-product-sync
+ * Text Domain: tk-product-sync-for-woocommerce
  * Domain Path: /languages
  * Network:     true
  * Requires at least: 5.8
@@ -35,8 +35,8 @@ function tk_check_requirements_on_activation()
     if (!tk_is_woocommerce_active()) {
         deactivate_plugins(plugin_basename(__FILE__));
         wp_die(
-            esc_html__('This plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce, then try again.', 'tk-woocommerce-product-sync'),
-            esc_html__('Activation Failed', 'tk-woocommerce-product-sync'),
+            esc_html__('This plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce, then try again.', 'tk-product-sync-for-woocommerce'),
+            esc_html__('Activation Failed', 'tk-product-sync-for-woocommerce'),
             array('back_link' => true)
         );
     }
@@ -48,8 +48,8 @@ function tk_woocommerce_missing_notice()
     if (!tk_is_woocommerce_active()) {
         printf(
             '<div class="notice notice-error"><p><strong>%s</strong>: %s</p></div>',
-            esc_html__('TK WooCommerce Product Sync', 'tk-woocommerce-product-sync'),
-            esc_html__('This plugin requires WooCommerce to be installed and active.', 'tk-woocommerce-product-sync')
+            esc_html__('TK Product Sync for WooCommerce', 'tk-product-sync-for-woocommerce'),
+            esc_html__('This plugin requires WooCommerce to be installed and active.', 'tk-product-sync-for-woocommerce')
         );
     }
 }
@@ -64,9 +64,6 @@ function tk_is_woocommerce_active()
         || is_plugin_active('woocommerce/woocommerce.php');
 }
 
-add_action('plugins_loaded', function () {
-    load_plugin_textdomain('tk-woocommerce-product-sync', false, dirname(plugin_basename(__FILE__)) . '/languages');
-});
 
 add_action('before_woocommerce_init', function () {
     if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
@@ -90,7 +87,7 @@ function tk_uninstall_confirmation_script()
 
             deleteLink.addEventListener('click', function (e) {
                 var message = [
-                    'Are you sure you want to delete TK WooCommerce Product Sync?\n',
+                    'Are you sure you want to delete TK Product Sync for WooCommerce?\n',
                     'The following will be permanently removed:',
                     '  - The sync relationship data stored on every product across all subsites (the _tk_master_product_id meta key).\n',
                     'The following will NOT be removed:',
@@ -137,8 +134,8 @@ add_filter('bulk_actions-edit-product', 'tk_register_bulk_actions', 99);
 function tk_register_bulk_actions($bulk_actions)
 {
     if (get_current_blog_id() == MASTER_BLOG_ID && current_user_can('edit_products')) {
-        $bulk_actions['tk_sync_products'] = __('Sync to All Subsites', 'tk-woocommerce-product-sync');
-        $bulk_actions['tk_delete_products'] = __('DELETE from All Subsites', 'tk-woocommerce-product-sync');
+        $bulk_actions['tk_sync_products'] = __('Sync to All Subsites', 'tk-product-sync-for-woocommerce');
+        $bulk_actions['tk_delete_products'] = __('DELETE from All Subsites', 'tk-product-sync-for-woocommerce');
     }
     return $bulk_actions;
 }
@@ -179,15 +176,16 @@ function tk_handle_bulk_actions($redirect_to, $action, $post_ids)
 add_action('admin_notices', 'tk_display_bulk_action_notices');
 function tk_display_bulk_action_notices()
 {
-    if (!empty($_REQUEST['tk_sync_products_queued'])) {
-        $count = absint($_REQUEST['tk_sync_products_queued']);
+    if (!empty($_REQUEST['tk_sync_products_queued'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $count = absint($_REQUEST['tk_sync_products_queued']); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $scheduler_url = esc_url(admin_url('admin.php?page=wc-status&tab=action-scheduler&s=tk-sync'));
         $message = sprintf(
+            /* translators: 1: number of products, 2: URL to scheduled actions page */
             _n(
-                '%s product queued for background sync. Monitor progress at <a href="%s">Scheduled Actions</a>.',
-                '%s products queued for background sync. Monitor progress at <a href="%s">Scheduled Actions</a>.',
+                '%1$s product queued for background sync. Monitor progress at <a href="%2$s">Scheduled Actions</a>.',
+                '%1$s products queued for background sync. Monitor progress at <a href="%2$s">Scheduled Actions</a>.',
                 $count,
-                'tk-woocommerce-product-sync'
+                'tk-product-sync-for-woocommerce'
             ),
             $count,
             $scheduler_url
@@ -195,16 +193,17 @@ function tk_display_bulk_action_notices()
         printf('<div id="message" class="updated fade"><p>%s</p></div>', wp_kses_post($message));
     }
 
-    if (!empty($_REQUEST['tk_products_deleted'])) {
-        $count = absint($_REQUEST['tk_products_deleted']);
+    if (!empty($_REQUEST['tk_products_deleted'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $count = absint($_REQUEST['tk_products_deleted']); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         printf(
             '<div id="message" class="error fade"><p>%s</p></div>',
             esc_html(sprintf(
+                /* translators: %s: number of products deleted */
                 _n(
                     '%s product successfully deleted from all subsites.',
                     '%s products successfully deleted from all subsites.',
                     $count,
-                    'tk-woocommerce-product-sync'
+                    'tk-product-sync-for-woocommerce'
                 ),
                 $count
             ))
@@ -268,11 +267,11 @@ function tk_delete_product_from_all_subsites($source_product_id)
 
         $existing_target_products = get_posts(array(
             'post_type' => 'product',
-            'meta_key' => MASTER_PRODUCT_META_KEY,
-            'meta_value' => $source_product_id,
+            'meta_key' => MASTER_PRODUCT_META_KEY, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+            'meta_value' => $source_product_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
             'fields' => 'ids',
             'posts_per_page' => 1,
-            'suppress_filters' => true,
+            'suppress_filters' => true, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters
         ));
 
         if (!empty($existing_target_products)) {
@@ -367,7 +366,9 @@ function tk_sync_product_to_target($source_product_id, $source_product)
 
     $target_product_id = $target_product->get_id();
     if (!$target_product_id) {
-        error_log("TK Sync Error: Could not create product on subsite for master ID $source_product_id.");
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("TK Sync Error: Could not create product on subsite for master ID $source_product_id."); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+        }
         return;
     }
 
@@ -397,11 +398,11 @@ function tk_get_or_create_target_product($source_product_id, $source_product)
 {
     $existing_target_products = get_posts(array(
         'post_type' => 'product',
-        'meta_key' => MASTER_PRODUCT_META_KEY,
-        'meta_value' => $source_product_id,
+        'meta_key' => MASTER_PRODUCT_META_KEY, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+        'meta_value' => $source_product_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
         'fields' => 'ids',
         'posts_per_page' => 1,
-        'suppress_filters' => true,
+        'suppress_filters' => true, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters
     ));
 
     if (!empty($existing_target_products)) {
@@ -462,7 +463,9 @@ function tk_sync_attachment($source_attachment_id, $parent_id)
     restore_current_blog();
 
     if (!$master_absolute_path || !$source_attachment_post) {
-        error_log("TK Sync Error: Source attachment ID $source_attachment_id not found on master site.");
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("TK Sync Error: Source attachment ID $source_attachment_id not found on master site."); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+        }
         return false;
     }
 
@@ -478,12 +481,16 @@ function tk_sync_attachment($source_attachment_id, $parent_id)
 
     if (!file_exists($target_file_path)) {
         if (!is_readable($master_absolute_path)) {
-            error_log("TK Sync Error: Cannot read source file $master_absolute_path. Check server file permissions.");
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("TK Sync Error: Cannot read source file $master_absolute_path. Check server file permissions."); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+            }
             return false;
         }
 
         if (!copy($master_absolute_path, $target_file_path)) {
-            error_log("TK Sync Error: Failed to copy file from $master_absolute_path to $target_file_path. Check server file permissions.");
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("TK Sync Error: Failed to copy file from $master_absolute_path to $target_file_path. Check server file permissions."); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+            }
             return false;
         }
     }
@@ -516,7 +523,9 @@ function tk_sync_attachment($source_attachment_id, $parent_id)
         $attach_data = wp_generate_attachment_metadata($target_attachment_id, $target_file_path);
 
         if (is_wp_error($attach_data)) {
-            error_log("TK Sync Metadata Error: Failed to generate metadata for $target_file_path. PHP Image Libraries missing/failing.");
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("TK Sync Metadata Error: Failed to generate metadata for $target_file_path. PHP Image Libraries missing/failing."); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+            }
             update_post_meta($target_attachment_id, '_wp_attached_file', $relative_path);
             return $target_attachment_id;
         }
@@ -631,7 +640,9 @@ function tk_sync_single_term($source_term, $taxonomy, &$synced_term_map)
         if (!is_wp_error($new_term) && !empty($new_term['term_id'])) {
             $target_term_id = (int) $new_term['term_id'];
         } else {
-            error_log('TK Sync Taxonomy Error: Failed to insert term ' . $source_term->name . ' (' . $source_term->slug . '): ' . (is_wp_error($new_term) ? $new_term->get_error_message() : 'Unknown Error'));
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('TK Sync Taxonomy Error: Failed to insert term ' . $source_term->name . ' (' . $source_term->slug . '): ' . (is_wp_error($new_term) ? $new_term->get_error_message() : 'Unknown Error')); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+            }
             return false;
         }
     }
@@ -709,11 +720,11 @@ function tk_get_target_variation_id($source_var_id, $target_parent_id)
     $existing = get_posts(array(
         'post_type' => 'product_variation',
         'post_parent' => $target_parent_id,
-        'meta_key' => MASTER_PRODUCT_META_KEY,
-        'meta_value' => $source_var_id,
+        'meta_key' => MASTER_PRODUCT_META_KEY, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+        'meta_value' => $source_var_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
         'fields' => 'ids',
         'posts_per_page' => 1,
-        'suppress_filters' => true,
+        'suppress_filters' => true, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters
     ));
     return !empty($existing) ? $existing[0] : 0;
 }
@@ -725,7 +736,7 @@ function tk_cleanup_old_variations($target_product_id, $keep_ids)
         'fields' => 'ids',
         'post_parent' => $target_product_id,
         'posts_per_page' => -1,
-        'suppress_filters' => true,
+        'suppress_filters' => true, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters
     ));
 
     foreach ($all_target_vars as $var_id) {

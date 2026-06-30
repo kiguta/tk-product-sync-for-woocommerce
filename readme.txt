@@ -1,9 +1,9 @@
-=== TK WooCommerce Product Sync for Multisite ===
+=== TK Product Sync for WooCommerce Multisite ===
 Contributors: toniekiguta
 Tags: woocommerce, multisite, product-sync, network, sync
 Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 5.0
@@ -17,7 +17,7 @@ Automatically sync WooCommerce products from your master site to all other sites
 
 Managing products across multiple WordPress sites can quickly become a headache. If you run a WordPress Multisite network — where several shops live under one WordPress installation — you would normally have to add or update each product on every site individually. This plugin solves that.
 
-**TK WooCommerce Product Sync** lets you manage all your products in one place — your main (master) site — and automatically copies every change to all other sites on your network. Update a price, swap an image, or add a new variation on the master site, and every other site reflects that change instantly without you lifting another finger.
+**TK Product Sync for WooCommerce** lets you manage all your products in one place — your main (master) site — and automatically copies every change to all other sites on your network. Update a price, swap an image, or add a new variation on the master site, and every other site reflects that change instantly without you lifting another finger.
 
 = What gets synced =
 
@@ -45,7 +45,7 @@ A **Sync to All Subsites** bulk action is also available on the Products screen 
 
 1. Download the plugin and upload the `tk-woocommerce-product-sync` folder to your `/wp-content/plugins/` directory.
 2. Log in to your **Network Admin** dashboard.
-3. Go to **Plugins** and find **TK WooCommerce Product Sync**.
+3. Go to **Plugins** and find **TK Product Sync for WooCommerce**.
 4. Click **Network Activate**.
 5. No configuration needed — sync begins automatically when you save a product on the master site.
 
@@ -86,6 +86,11 @@ The plugin logs the error to your server's PHP error log and continues syncing t
 3. The confirmation prompt shown when deleting the plugin, listing what data will be removed.
 
 == Changelog ==
+
+= 1.1.2 =
+* Gated all debug error_log() calls behind WP_DEBUG to comply with WordPress plugin coding standards.
+* Added phpcs:ignore annotations on error_log() lines to satisfy static analysis checks.
+* Fixed phpcs:ignore placement in uninstall.php so the meta_key slow query notice is correctly suppressed on the right line.
 
 = 1.1.1 =
 * Declared HPOS (High-Performance Order Storage) compatibility to resolve the WooCommerce incompatible plugins notice.
