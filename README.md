@@ -127,6 +127,10 @@ All sites in a WordPress Multisite network typically share the same `wp-content/
 
 ## Changelog
 
+### v1.1.3
+
+- Replaced hardcoded `<script>` tag with `wp_register_script()` and `wp_add_inline_script()` for WordPress coding standards compliance.
+
 ### v1.1.2
 
 - Gated all debug error_log() calls behind WP_DEBUG to comply with WordPress plugin coding standards.

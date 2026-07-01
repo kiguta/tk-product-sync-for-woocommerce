@@ -89,7 +89,6 @@ The plugin logs the error to your server's PHP error log and continues syncing t
 
 = 1.1.3 =
 * Replaced hardcoded `<script>` tag with `wp_register_script()` and `wp_add_inline_script()` for WordPress coding standards compliance.
-* Updated Author URI to https://github.com/kiguta.
 
 = 1.1.2 =
 * Gated all debug error_log() calls behind WP_DEBUG to comply with WordPress plugin coding standards.
