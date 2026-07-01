@@ -3,9 +3,9 @@
  * Plugin Name: TK Products Sync for Multisite
  * Plugin URI:  https://github.com/kiguta/tk-products-sync-for-multisite
  * Description: Automatically syncs WooCommerce products (Simple & Variable) from the master site to all subsites in a WordPress Multisite network. Includes bulk sync and bulk delete actions.
- * Version:     1.1.2
+ * Version:     1.1.3
  * Author:      Tonie Kiguta
- * Author URI:  https://ziprof.co.ke
+ * Author URI:  https://github.com/kiguta
  * License:     GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: tk-products-sync-for-multisite
@@ -88,35 +88,37 @@ function tk_plugin_row_meta($links, $file)
 // --- DELETION CONFIRMATION PROMPT (Plugins screen) ---
 // ---------------------------------------------------------------------
 
-add_action('admin_footer-plugins.php', 'tk_uninstall_confirmation_script');
-function tk_uninstall_confirmation_script()
+add_action('admin_enqueue_scripts', 'tk_enqueue_uninstall_confirmation_script');
+function tk_enqueue_uninstall_confirmation_script($hook)
 {
+    if ($hook !== 'plugins.php') {
+        return;
+    }
+
     $plugin_file = plugin_basename(__FILE__);
-    ?>
-    <script type="text/javascript">
-        (function () {
-            var deleteLink = document.querySelector('tr[data-plugin="<?php echo esc_js($plugin_file); ?>"] .delete a');
-            if (!deleteLink) return;
+    $message     = implode("\n", [
+        'Are you sure you want to delete TK Products Sync for Multisite?',
+        '',
+        'The following will be permanently removed:',
+        '  - The sync relationship data stored on every product across all subsites (the _tk_master_product_id meta key).',
+        '',
+        'The following will NOT be removed:',
+        '  - The products themselves on each subsite.',
+        '  - Product images that were copied to subsite upload folders.',
+        '  - Categories and tags that were created on subsites.',
+        '',
+        'Click OK to confirm deletion, or Cancel to go back.',
+    ]);
 
-            deleteLink.addEventListener('click', function (e) {
-                var message = [
-                    'Are you sure you want to delete TK Products Sync for Multisite?\n',
-                    'The following will be permanently removed:',
-                    '  - The sync relationship data stored on every product across all subsites (the _tk_master_product_id meta key).\n',
-                    'The following will NOT be removed:',
-                    '  - The products themselves on each subsite.',
-                    '  - Product images that were copied to subsite upload folders.',
-                    '  - Categories and tags that were created on subsites.\n',
-                    'Click OK to confirm deletion, or Cancel to go back.'
-                ].join('\n');
+    $inline_js = sprintf(
+        '(function(){var l=document.querySelector(%s);if(!l)return;l.addEventListener("click",function(e){if(!window.confirm(%s)){e.preventDefault();}});})()',
+        wp_json_encode('tr[data-plugin="' . esc_attr($plugin_file) . '"] .delete a'),
+        wp_json_encode($message)
+    );
 
-                if (!window.confirm(message)) {
-                    e.preventDefault();
-                }
-            });
-        })();
-    </script>
-    <?php
+    wp_register_script('tk-uninstall-confirm', false, [], null, true);
+    wp_enqueue_script('tk-uninstall-confirm');
+    wp_add_inline_script('tk-uninstall-confirm', $inline_js);
 }
 
 // ---------------------------------------------------------------------

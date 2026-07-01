@@ -1,9 +1,9 @@
 === TK Products Sync for Multisite ===
-Contributors: toniekiguta
+Contributors: tkiguta
 Tags: woocommerce, multisite, product-sync, network, sync
 Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 Requires PHP: 7.4
 Requires Plugins: woocommerce
 WC requires at least: 5.0
@@ -86,6 +86,10 @@ The plugin logs the error to your server's PHP error log and continues syncing t
 3. The confirmation prompt shown when deleting the plugin, listing what data will be removed.
 
 == Changelog ==
+
+= 1.1.3 =
+* Replaced hardcoded `<script>` tag with `wp_register_script()` and `wp_add_inline_script()` for WordPress coding standards compliance.
+* Updated Author URI to https://github.com/kiguta.
 
 = 1.1.2 =
 * Gated all debug error_log() calls behind WP_DEBUG to comply with WordPress plugin coding standards.
